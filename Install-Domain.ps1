@@ -10,6 +10,8 @@ Install-WindowsFeature -name AD-Domain-Services -IncludeManagementTools
 
 Restart-NetAdapter -Name "Ethernet"
 
+Add-Content -Path $env:windir\System32\drivers\etc\hosts -Value "`n10.5.1.4`tad.pgzr.io" -Force
+
 $dnsExists = Resolve-DnsName -Name $domainName
 
 if ($dnsExists) {
@@ -17,3 +19,5 @@ if ($dnsExists) {
 } else {
     Install-ADDSForest -DomainName ad.pgzr.io -DatabasePath 'E:\NTDS' -LogPath 'E:\Logs' -SysvolPath 'E:\SYSVOL' -SafeModeAdministratorPassword $dsrmPassword -InstallDNS -Confirm:$false
 }
+
+Add-Content -Path $env:windir\System32\drivers\etc\hosts -Value "`n10.5.1.4`tad.pgzr.io" -Force
