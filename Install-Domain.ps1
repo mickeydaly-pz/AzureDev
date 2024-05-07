@@ -10,7 +10,7 @@ Install-WindowsFeature -name AD-Domain-Services -IncludeManagementTools
 
 Restart-NetAdapter -Name "Ethernet"
 
-Add-Content -Path $env:windir\System32\drivers\etc\hosts -Value "`n10.5.1.4`tad.pgzr.io" -Force
+Start-Sleep -Seconds 5t
 
 $dnsExists = Resolve-DnsName -Name $domainName
 
