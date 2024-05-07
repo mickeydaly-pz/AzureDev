@@ -233,7 +233,7 @@ resource "azurerm_virtual_machine_extension" "dc_install" {
   settings = <<SETTINGS
     {
       "fileUris": ["https://raw.githubusercontent.com/mickeydaly-pz/AzureDev/main/Install-Domain.ps1"],
-      "commandToExecute": "powershell -ExecutionPolicy Unrestricted -NoProfile -NonInteractive \"./Install-Domain.ps1 -dsrmPassword '${random_password.password_dsrm.result}' -localPassword '${random_password.password_local.result}' -domainName 'ad.pgzr.io' -username 'maadmin'\""
+      "commandToExecute": "powershell -ExecutionPolicy Unrestricted -NoProfile -NonInteractive \"./Install-Domain.ps1 -dsrmPassword (ConvertTo-SecureString '${random_password.password_dsrm.result}' -AsPlainText -Force) -localPassword (ConvertTo-SecureString '${random_password.password_local.result}' -AsPlainText -Force) -domainName 'ad.pgzr.io' -username 'maadmin'\""
     }
   SETTINGS
 }
@@ -249,7 +249,7 @@ resource "azurerm_virtual_machine_extension" "dc_install2" {
   settings = <<SETTINGS
     {
       "fileUris": ["https://raw.githubusercontent.com/mickeydaly-pz/AzureDev/main/Install-Domain.ps1"],
-      "commandToExecute": "powershell -ExecutionPolicy Unrestricted -NoProfile -NonInteractive \"./Install-Domain.ps1 -dsrmPassword '${random_password.password_dsrm2.result}' -localPassword '${random_password.password_local.result}' -domainName 'ad.pgzr.io' -username 'maadmin'\""
+      "commandToExecute": "powershell -ExecutionPolicy Unrestricted -NoProfile -NonInteractive \"./Install-Domain.ps1 -dsrmPassword (ConvertTo-SecureString '${random_password.password_dsrm2.result}' -AsPlainText -Force) -localPassword (ConvertTo-SecureString '${random_password.password_local.result}' -AsPlainText -Force) -domainName 'ad.pgzr.io' -username 'maadmin'\""
     }
   SETTINGS
 }
