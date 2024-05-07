@@ -10,10 +10,10 @@ Install-WindowsFeature -name AD-Domain-Services -IncludeManagementTools
 
 Restart-NetAdapter -Name "Ethernet"
 
-try {
-    Resolve-DnsName -Name $domainName
+$dnsExists = Resolve-DnsName -Name $domainName
+
+if ($dnsExists) {
     Install-ADDSDomainController -Credential (New-Object System.Management.Automation.PSCredential ($username, $localPassword)) -DatabasePath 'E:\NTDS' -LogPath 'E:\Logs' -SysvolPath 'E:\SYSVOL' -DomainName '$domainName' -InstallDNS -SafeModeAdministratorPassword $dsrmPassword -Confirm:$false
-} catch {
+} else {
     Install-ADDSForest -DomainName ad.pgzr.io -DatabasePath 'E:\NTDS' -LogPath 'E:\Logs' -SysvolPath 'E:\SYSVOL' -SafeModeAdministratorPassword $dsrmPassword -InstallDNS -Confirm:$false
 }
-
