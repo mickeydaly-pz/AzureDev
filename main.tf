@@ -229,9 +229,11 @@ resource "azurerm_virtual_machine_extension" "dc_install" {
   type_handler_version       = "1.8"
   auto_upgrade_minor_version = true
   depends_on = [ azurerm_managed_disk.main_data ]
+  
   settings = <<SETTINGS
     {
-      "commandToExecute": "powershell -ExecutionPolicy Unrestricted \"Get-Disk | Where partitionstyle -eq 'raw' | Initialize-Disk -PassThru | New-Partition -DriveLetter E -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel 'data' -Confirm:$false\"; Install-WindowsFeature -name AD-Domain-Services -IncludeManagementTools; Install-ADDSForest -DomainName ad.pgzr.io -DatabasePath 'E:\\NTDS' -LogPath 'E:\\Logs' -SysvolPath 'E:\\SYSVOL' -SafeModeAdministratorPassword (convertto-securestring '${random_password.password_dsrm.result}' -asplaintext -force) -InstallDNS -Confirm:$false"
+      "fileUris": ["https://raw.githubusercontent.com/mickeydaly-pz/AzureDev/main/Install-Domain.ps1"]
+      "commandToExecute": "powershell -ExecutionPolicy Unrestricted -NoProfile -NonInteractive -File \"./Install-Domain.ps1 -dsrmPassword ${random_password.password_dsrm.result} -localPassword ${random_password.password_local} -domainName 'ad.pgzr.io' -username 'maadmin'\""
     }
   SETTINGS
 }
@@ -246,7 +248,8 @@ resource "azurerm_virtual_machine_extension" "dc_install2" {
   depends_on = [ azurerm_virtual_machine_extension.dc_install, azurerm_managed_disk.backup_data ]
   settings = <<SETTINGS
     {
-      "commandToExecute": "powershell -ExecutionPolicy Unrestricted Restart-NetAdapter -Name 'Ethernet'; \"Get-Disk | Where partitionstyle -eq 'raw' | Initialize-Disk -PassThru | New-Partition -DriveLetter E -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel 'data' -Confirm:$false\"; Install-WindowsFeature -name AD-Domain-Services -IncludeManagementTools; Install-ADDSDomainController -Credential (New-Object System.Management.Automation.PSCredential ('maadmin', (convertto-securestring '${random_password.password_local.result}' -asplaintext -force))) -DatabasePath 'E:\\NTDS' -LogPath 'E:\\Logs' -SysvolPath 'E:\\SYSVOL' -DomainName 'ad.pgzr.io' -InstallDNS -SafeModeAdministratorPassword (convertto-securestring '${random_password.password_dsrm2.result}' -asplaintext -force) -Confirm:$false"
+      "fileUris": ["https://raw.githubusercontent.com/mickeydaly-pz/AzureDev/main/Install-Domain.ps1"]
+      "commandToExecute": "powershell -ExecutionPolicy Unrestricted -NoProfile -NonInteractive -File \"./Install-Domain.ps1 -dsrmPassword ${random_password.password_dsrm2.result} -localPassword ${random_password.password_local} -domainName 'ad.pgzr.io' -username 'maadmin'\""
     }
   SETTINGS
 }
