@@ -232,7 +232,7 @@ resource "azurerm_virtual_machine_extension" "dc_install" {
   
   settings = <<SETTINGS
     {
-      "fileUris": ["https://raw.githubusercontent.com/mickeydaly-pz/AzureDev/main/Install-Domain.ps1"]
+      "fileUris": ["https://raw.githubusercontent.com/mickeydaly-pz/AzureDev/main/Install-Domain.ps1"],
       "commandToExecute": "powershell -ExecutionPolicy Unrestricted -NoProfile -NonInteractive -File \"./Install-Domain.ps1 -dsrmPassword ${random_password.password_dsrm.result} -localPassword ${random_password.password_local.result} -domainName 'ad.pgzr.io' -username 'maadmin'\""
     }
   SETTINGS
@@ -248,7 +248,7 @@ resource "azurerm_virtual_machine_extension" "dc_install2" {
   depends_on = [ azurerm_virtual_machine_extension.dc_install, azurerm_managed_disk.backup_data ]
   settings = <<SETTINGS
     {
-      "fileUris": ["https://raw.githubusercontent.com/mickeydaly-pz/AzureDev/main/Install-Domain.ps1"]
+      "fileUris": ["https://raw.githubusercontent.com/mickeydaly-pz/AzureDev/main/Install-Domain.ps1"],
       "commandToExecute": "powershell -ExecutionPolicy Unrestricted -NoProfile -NonInteractive -File \"./Install-Domain.ps1 -dsrmPassword ${random_password.password_dsrm2.result} -localPassword ${random_password.password_local.result} -domainName 'ad.pgzr.io' -username 'maadmin'\""
     }
   SETTINGS
