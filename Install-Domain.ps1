@@ -10,7 +10,7 @@ Install-WindowsFeature -name AD-Domain-Services -IncludeManagementTools
 
 Restart-NetAdapter -Name "Ethernet"
 
-Start-Sleep -Seconds 5t
+Start-Sleep -Seconds 5
 
 $dnsExists = Resolve-DnsName -Name $domainName
 
