@@ -315,10 +315,10 @@ resource "random_password" "password_dsrm2" {
 
 resource "random_pet" "prefix" {
   prefix = var.customer_prefix
-  length = 1
+  separator = "-"
 }
 
 resource "random_pet" "prefix2" {
   prefix = var.customer_prefix
-  length = 1
+  separator = "-"
 }
