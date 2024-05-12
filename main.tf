@@ -130,7 +130,7 @@ resource "azurerm_storage_account" "pz-ad-sa2" {
 
 # Create virtual machine
 resource "azurerm_windows_virtual_machine" "main" {
-  name                  = "${random_pet.prefix.id}-dc"
+  name                  = "${random_pet.prefix.id}-dc1"
   admin_username        = "maadmin"
   admin_password        = random_password.password_local.result
   location              = azurerm_resource_group.rg.location
@@ -191,7 +191,7 @@ resource "azurerm_virtual_machine_data_disk_attachment" "backup_data_attachment"
 
 # Create virtual machine
 resource "azurerm_windows_virtual_machine" "backup" {
-  name                  = "${random_pet.prefix2.id}-dc"
+  name                  = "${random_pet.prefix2.id}-dc2"
   admin_username        = "maadmin"
   admin_password        = random_password.password_local2.result
   location              = azurerm_resource_group.rg2.location
