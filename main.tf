@@ -191,7 +191,7 @@ resource "azurerm_virtual_machine_data_disk_attachment" "backup_data_attachment"
 
 # Create virtual machine
 resource "azurerm_windows_virtual_machine" "backup" {
-  name                  = "${random_pet.prefix2.id}"
+  name                  = "${random_pet.prefix2.id}-dc"
   admin_username        = "maadmin"
   admin_password        = random_password.password_local2.result
   location              = azurerm_resource_group.rg2.location
@@ -222,7 +222,7 @@ resource "azurerm_windows_virtual_machine" "backup" {
 }
 
 resource "azurerm_virtual_machine_extension" "dc_install" {
-  name                       = "${random_pet.prefix.id}"
+  name                       = "${random_pet.prefix.id}-dc1"
   virtual_machine_id         = azurerm_windows_virtual_machine.main.id
   publisher                  = "Microsoft.Compute"
   type                       = "CustomScriptExtension"
@@ -239,7 +239,7 @@ resource "azurerm_virtual_machine_extension" "dc_install" {
 }
 
 resource "azurerm_virtual_machine_extension" "dc_install2" {
-  name                       = "${random_pet.prefix2.id}-dc"
+  name                       = "${random_pet.prefix2.id}-dc2"
   virtual_machine_id         = azurerm_windows_virtual_machine.backup.id
   publisher                  = "Microsoft.Compute"
   type                       = "CustomScriptExtension"
@@ -314,11 +314,11 @@ resource "random_password" "password_dsrm2" {
 }
 
 resource "random_pet" "prefix" {
-  prefix = var.dc_main_prefix
+  prefix = var.customer_prefix
   length = 1
 }
 
 resource "random_pet" "prefix2" {
-  prefix = var.dc_backup_prefix
+  prefix = var.customer_prefix
   length = 1
 }

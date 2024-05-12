@@ -9,18 +9,6 @@ variable "customer_prefix" {
   description = "Prefix of the resource name"
 }
 
-variable "dc_main_prefix" {
-    type        = string
-    default     = "PZ-DC1"
-    description = "Prefix of the resource name"
-}
-
-variable "dc_backup_prefix" {
-    type        = string
-    default     = "PZ-DC2"
-    description = "Prefix of the resource name"
-}
-
 variable "source_ip" {
     type = string
     default = "24.109.16.62/32"
