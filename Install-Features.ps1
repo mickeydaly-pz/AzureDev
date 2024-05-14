@@ -12,4 +12,4 @@ Install-WindowsFeature -name AD-Domain-Services -IncludeManagementTools
 Restart-NetAdapter -Name "Ethernet"
 
 
-& "./Install-Domain.ps1" -dsrmPassword (ConvertTo-SecureString $dsrmPassword -AsPlainText -Force) -localPassword (ConvertTo-SecureString $localPassword -AsPlainText -Force) -domainName $domainName -backupDC $backupDC -username "maadmin"
+.\Install-Domain.ps1 -dsrmPassword (ConvertTo-SecureString $dsrmPassword -AsPlainText -Force) -localPassword (ConvertTo-SecureString $localPassword -AsPlainText -Force) -domainName $domainName -backupDC $backupDC -username "maadmin"
