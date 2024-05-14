@@ -21,6 +21,7 @@ resource "azurerm_virtual_network" "pz-ad-vnet" {
   address_space       = ["10.5.1.0/27"]
   location            = azurerm_resource_group.rg3.location
   resource_group_name = azurerm_resource_group.rg3.name
+  dns_servers = [ "10.5.1.4", "10.5.1.5", "8.8.8.8", "8.8.4.4" ]
 }
 
 # Create subnet
@@ -29,19 +30,6 @@ resource "azurerm_subnet" "pz-ad-subnet" {
   resource_group_name  = azurerm_resource_group.rg3.name
   virtual_network_name = azurerm_virtual_network.pz-ad-vnet.name
   address_prefixes     = ["10.5.1.0/28"]
-}
-
-resource "azurerm_private_dns_zone" "domain" {
-  name                = "ad.pgzr.io"
-  resource_group_name = azurerm_resource_group.rg3.name
-}
-
-resource "azurerm_private_dns_a_record" "dc" {
-  name                = "@"
-  zone_name           = azurerm_private_dns_zone.domain.name
-  resource_group_name = azurerm_resource_group.rg3.name
-  ttl                 = 300
-  records             = ["10.5.1.4"]
 }
 
 # Create public IPs
