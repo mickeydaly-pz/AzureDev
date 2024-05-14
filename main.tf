@@ -21,7 +21,7 @@ resource "azurerm_virtual_network" "pz-ad-vnet" {
   address_space       = ["10.5.1.0/27"]
   location            = azurerm_resource_group.rg3.location
   resource_group_name = azurerm_resource_group.rg3.name
-  dns_servers = [ "10.5.1.4", "10.5.1.5", "8.8.8.8", "8.8.4.4" ]
+  dns_servers = [ "10.5.1.4", "10.5.1.5" ]
 }
 
 # Create subnet
@@ -199,7 +199,6 @@ resource "azurerm_windows_virtual_machine" "backup" {
   network_interface_ids = [azurerm_network_interface.pz-ad-nic2.id]
   size                  = "Standard_D2as_v5"
   patch_mode = "AutomaticByPlatform"
-  depends_on = [ azurerm_virtual_machine_extension.dc_install ]
   os_disk {
     name                 = "${var.customer_prefix}-dc2-os"
     caching              = "ReadWrite"
@@ -228,7 +227,6 @@ resource "azurerm_virtual_machine_extension" "dc_install" {
   type                       = "CustomScriptExtension"
   type_handler_version       = "1.8"
   auto_upgrade_minor_version = true
-  depends_on = [ azurerm_managed_disk.main_data ]
   
   settings = <<SETTINGS
     {
@@ -245,11 +243,11 @@ resource "azurerm_virtual_machine_extension" "dc_install2" {
   type                       = "CustomScriptExtension"
   type_handler_version       = "1.8"
   auto_upgrade_minor_version = true
-  depends_on = [ azurerm_virtual_machine_extension.dc_install, azurerm_managed_disk.backup_data ]
+  depends_on = [ azurerm_virtual_machine_extension.dc_install ]
   settings = <<SETTINGS
     {
       "fileUris": ["https://raw.githubusercontent.com/mickeydaly-pz/AzureDev/main/Install-Domain.ps1"],
-      "commandToExecute": "powershell -ExecutionPolicy Unrestricted Restart-NetAdapter -Name \"Ethernet\"; \"./Install-Domain.ps1 -dsrmPassword (ConvertTo-SecureString '${random_password.password_dsrm2.result}' -AsPlainText -Force) -localPassword (ConvertTo-SecureString '${random_password.password_local.result}' -AsPlainText -Force) -domainName 'ad.pgzr.io' -dnsExists $true -username 'AD\\maadmin'\""
+      "commandToExecute": "powershell -ExecutionPolicy Unrestricted \"./Install-Domain.ps1 -dsrmPassword (ConvertTo-SecureString '${random_password.password_dsrm2.result}' -AsPlainText -Force) -localPassword (ConvertTo-SecureString '${random_password.password_local.result}' -AsPlainText -Force) -domainName 'ad.pgzr.io' -dnsExists $true -username 'AD\\maadmin'\""
     }
   SETTINGS
 }
