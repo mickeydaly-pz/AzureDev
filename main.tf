@@ -2,12 +2,12 @@
 
 resource "azurerm_resource_group" "rg" {
   location = var.resource_group_location
-  name     = "${random_pet.prefix.id}-rg"
+  name     = "${var.customer_prefix}-dc1-rg"
 }
 
 resource "azurerm_resource_group" "rg2" {
   location = var.resource_group_location
-  name     = "${random_pet.prefix2.id}-rg"
+  name     = "${var.customer_prefix}-dc2-rg"
 }
 
 resource "azurerm_resource_group" "rg3" {
@@ -34,17 +34,17 @@ resource "azurerm_subnet" "pz-ad-subnet" {
 
 # Create public IPs
 resource "azurerm_public_ip" "pz-ad-pip" {
-  name                = "${random_pet.prefix.id}-public-ip"
-  location            = azurerm_resource_group.rg3.location
-  resource_group_name = azurerm_resource_group.rg3.name
+  name                = "${var.customer_prefix}-dc1-public-ip"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Dynamic"
 }
 
 # Create public IPs
 resource "azurerm_public_ip" "pz-ad-pip2" {
-  name                = "${random_pet.prefix2.id}-public-ip"
-  location            = azurerm_resource_group.rg3.location
-  resource_group_name = azurerm_resource_group.rg3.name
+  name                = "${var.customer_prefix}-dc2-public-ip"
+  location            = azurerm_resource_group.rg2.location
+  resource_group_name = azurerm_resource_group.rg2.name
   allocation_method   = "Dynamic"
 }
 
@@ -69,7 +69,7 @@ resource "azurerm_network_security_group" "pz-ad-nsg" {
 
 # Create network interface
 resource "azurerm_network_interface" "pz-ad-nic" {
-  name                = "${random_pet.prefix.id}-nic"
+  name                = "${var.customer_prefix}-dc1-nic"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
@@ -84,7 +84,7 @@ resource "azurerm_network_interface" "pz-ad-nic" {
 
 # Create network interface
 resource "azurerm_network_interface" "pz-ad-nic2" {
-  name                = "${random_pet.prefix2.id}-nic"
+  name                = "${var.customer_prefix}-dc2-nic"
   location            = azurerm_resource_group.rg2.location
   resource_group_name = azurerm_resource_group.rg2.name
   depends_on = [ azurerm_virtual_machine_extension.dc_install ]
@@ -104,7 +104,7 @@ resource "azurerm_network_interface_security_group_association" "pz-ad-nic-nsg" 
 }
 
 # Connect the security group to the network interface
-resource "azurerm_network_interface_security_group_association" "pz-ad-ni2c-nsg" {
+resource "azurerm_network_interface_security_group_association" "pz-ad-nic2-nsg" {
   network_interface_id      = azurerm_network_interface.pz-ad-nic2.id
   network_security_group_id = azurerm_network_security_group.pz-ad-nsg.id
 }
@@ -130,7 +130,7 @@ resource "azurerm_storage_account" "pz-ad-sa2" {
 
 # Create virtual machine
 resource "azurerm_windows_virtual_machine" "main" {
-  name                  = "${random_pet.prefix.id}-dc1"
+  name                  = "${var.customer_prefix}-dc1"
   admin_username        = "maadmin"
   admin_password        = random_password.password_local.result
   location              = azurerm_resource_group.rg.location
@@ -139,7 +139,7 @@ resource "azurerm_windows_virtual_machine" "main" {
   size                  = "Standard_D2as_v5"
   patch_mode = "AutomaticByPlatform"
   os_disk {
-    name                 = "${random_pet.prefix.id}-os"
+    name                 = "${var.customer_prefix}-dc1-os"
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
   }
@@ -158,7 +158,7 @@ resource "azurerm_windows_virtual_machine" "main" {
 }
 
 resource "azurerm_managed_disk" "main_data" {
-  name                 = "${random_pet.prefix.id}-data"
+  name                 = "${var.customer_prefix}-dc1-data"
   location             = azurerm_resource_group.rg.location
   resource_group_name  = azurerm_resource_group.rg.name
   storage_account_type = "Standard_LRS"
@@ -174,7 +174,7 @@ resource "azurerm_virtual_machine_data_disk_attachment" "main_data_attachment" {
 }
 
 resource "azurerm_managed_disk" "backup_data" {
-  name                 = "${random_pet.prefix2.id}-data"
+  name                 = "${var.customer_prefix}-dc2-data"
   location             = azurerm_resource_group.rg2.location
   resource_group_name  = azurerm_resource_group.rg2.name
   storage_account_type = "Standard_LRS"
@@ -191,7 +191,7 @@ resource "azurerm_virtual_machine_data_disk_attachment" "backup_data_attachment"
 
 # Create virtual machine
 resource "azurerm_windows_virtual_machine" "backup" {
-  name                  = "${random_pet.prefix2.id}-dc2"
+  name                  = "${var.customer_prefix}-dc2"
   admin_username        = "maadmin"
   admin_password        = random_password.password_local2.result
   location              = azurerm_resource_group.rg2.location
@@ -201,7 +201,7 @@ resource "azurerm_windows_virtual_machine" "backup" {
   patch_mode = "AutomaticByPlatform"
   depends_on = [ azurerm_virtual_machine_extension.dc_install ]
   os_disk {
-    name                 = "${random_pet.prefix2.id}-os"
+    name                 = "${var.customer_prefix}-dc2-os"
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
   }
@@ -222,7 +222,7 @@ resource "azurerm_windows_virtual_machine" "backup" {
 }
 
 resource "azurerm_virtual_machine_extension" "dc_install" {
-  name                       = "${random_pet.prefix.id}-dc"
+  name                       = "${var.customer_prefix}-dc1"
   virtual_machine_id         = azurerm_windows_virtual_machine.main.id
   publisher                  = "Microsoft.Compute"
   type                       = "CustomScriptExtension"
@@ -239,7 +239,7 @@ resource "azurerm_virtual_machine_extension" "dc_install" {
 }
 
 resource "azurerm_virtual_machine_extension" "dc_install2" {
-  name                       = "${random_pet.prefix2.id}-dc"
+  name                       = "${var.customer_prefix}-dc2"
   virtual_machine_id         = azurerm_windows_virtual_machine.backup.id
   publisher                  = "Microsoft.Compute"
   type                       = "CustomScriptExtension"
@@ -311,14 +311,4 @@ resource "random_password" "password_dsrm2" {
   min_special = 1
   special     = true
   override_special = "!?*()"
-}
-
-resource "random_pet" "prefix" {
-  prefix = var.customer_prefix
-  length = 1
-}
-
-resource "random_pet" "prefix2" {
-  prefix = var.customer_prefix
-  length = 1
 }

@@ -2,4 +2,4 @@
 .terraform/*
 .terraform*
 terraform.*
-tfplan
+.tfplan
