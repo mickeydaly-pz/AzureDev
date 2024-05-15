@@ -13,3 +13,5 @@ Restart-NetAdapter -Name "Ethernet"
 
 
 .\Install-AD.ps1 -dsrmPassword $dsrmPassword -localPassword $localPassword -domainName $domainName -backupDC $backupDC -username $username
+
+Restart-Computer
